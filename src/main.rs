@@ -3,17 +3,25 @@ use std::marker::PhantomData;
 
 use units::measures;
 
-trait Unit {
+trait UnitConversion {
     fn from_pure(value: f64) -> f64;
     fn to_pure(value: f64) -> f64;
 }
 
-struct UnitValue<T: Unit> {
+trait UnitValueType {
+    const VALUE_TYPE: &'static str;
+}
+
+trait UnitAbbreviation {
+    const ABBREVIATION: &'static str;
+}
+
+struct UnitValue<T: UnitConversion> {
     value: f64,
     unit: PhantomData<T>,
 }
 
-impl<T: Unit> UnitValue<T> {
+impl<T: UnitConversion> UnitValue<T> {
     fn to_pure(self: &Self) -> f64 {
         T::to_pure(self.value)
     }
@@ -29,7 +37,7 @@ impl<T: Unit> UnitValue<T> {
 #[measures(space)]
 struct Meter;
 
-impl Unit for Meter {
+impl UnitConversion for Meter {
     fn from_pure(value: f64) -> f64 {
         value
     }
@@ -42,7 +50,7 @@ impl Unit for Meter {
 #[measures(space)]
 struct Centimeter;
 
-impl Unit for Centimeter {
+impl UnitConversion for Centimeter {
     fn from_pure(value: f64) -> f64 {
         value * 100.0
     }
